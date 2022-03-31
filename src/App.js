@@ -1,25 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import axios from "axios";
+import NoRecipes from "./components/NoRecipes";
 
-function App() {
+const App = () => {
+  const getRequest = () => {
+    axios
+      .get(
+        `https://api.spoonacular.com/recipes/random?apiKey=${process.env.REACT_APP_API_KEY}`
+      )
+      .then((res) => {
+        const recipe = res.data["recipes"][0];
+        setRecipes([
+          ...recipes,
+          {
+            id: recipe.id,
+            img: recipe.image,
+            props: recipe.diets,
+            title: recipe.title,
+            vegan: recipe.vegan,
+            price: recipe.pricePerServing,
+            time: recipe.readyInMinutes,
+            healthScore: recipe.healthScore,
+          },
+        ]);
+      });
+  };
+
+  const [recipes, setRecipes] = useState([]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <button onClick={getRequest}> Call function </button>
+      {recipes.length == 0 ? <NoRecipes /> : <></>}
+
+      <ul>
+        {recipes.map((recipe) => (
+          <li key={recipe.id}>{recipe.title}</li>
+        ))}
+      </ul>
+    </>
   );
-}
+};
 
 export default App;
