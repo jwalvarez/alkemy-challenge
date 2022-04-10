@@ -1,7 +1,32 @@
 import React from "react";
 import { Formik } from "formik";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 const Login = () => {
+  let navigate = useNavigate();
+  const login = ({ email, password }) => {
+    axios({
+      method: "post",
+      url: "http://challenge-react.alkemy.org/",
+      data: {
+        email: email,
+        password: password,
+      },
+    })
+      .then(function (response) {
+        localStorage.setItem("alkemyToken", response.data["token"]);
+        navigate("/");
+      })
+      .catch(function (error) {
+        Swal.fire(
+          "Hubo un problema",
+          "Por favor, verifica las credenciales proporcionadas",
+          "error"
+        );
+      });
+  };
   return (
     <div className="row min-vh-100 d-flex justify-content-center align-items-center ">
       <div className="col"></div>
@@ -19,7 +44,10 @@ const Login = () => {
           </p>
 
           <Formik
-            initialValues={{ email: "", password: "" }}
+            initialValues={{
+              email: process.env.REACT_APP_USERNAME,
+              password: "",
+            }}
             validate={(values) => {
               const errors = {};
               if (!values.email) {
@@ -33,9 +61,9 @@ const Login = () => {
             }}
             onSubmit={(values, { setSubmitting }) => {
               setTimeout(() => {
-                alert(JSON.stringify(values, null, 2));
                 setSubmitting(false);
-              }, 400);
+                login(values);
+              }, 2000);
             }}
           >
             {({
@@ -74,7 +102,7 @@ const Login = () => {
                 />
                 {errors.password && touched.password && errors.password}
                 <button
-                  className="btn btn-primary w-100"
+                  className="btn btn-success w-100"
                   type="submit"
                   disabled={isSubmitting}
                 >

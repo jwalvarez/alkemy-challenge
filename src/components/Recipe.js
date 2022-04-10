@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import Swal from "sweetalert2";
 
 const Recipe = ({
   deleteRecipe,
@@ -16,6 +17,12 @@ const Recipe = ({
         `https://api.spoonacular.com/recipes/${recipe.id}/information/?apiKey=${process.env.REACT_APP_API_KEY}`
       )
       .then((res) => {
+        Swal.fire(
+          "Yeiii",
+          "¡El producto se ha agregado correctamente!",
+          "success"
+        );
+
         const recipe = res.data;
 
         let veganCounter = 0;
@@ -23,7 +30,6 @@ const Recipe = ({
           recipe["vegan"] && veganCounter++;
         });
         res.data["vegan"] && veganCounter++;
-        console.log(recipes.length);
 
         if (recipes.length < 4 && veganCounter <= 2) {
           setRecipes([
@@ -40,9 +46,15 @@ const Recipe = ({
             },
             ...recipes,
           ]);
-          setShowingResults(false);
           setSearchResults([]);
+        } else {
+          Swal.fire(
+            "Hey",
+            "¡Recuerda que no puedes agregar más de 2 platos veganos y no más de 4 platos en total!",
+            "error"
+          );
         }
+        setShowingResults(false);
       });
   };
 
@@ -73,13 +85,6 @@ const Recipe = ({
         </div>
       )}
       <div className="row g-0">
-        {/* <div className="col-2">
-          <img
-            src={recipe.img ? recipe.img : recipe.image}
-            className="w-auto h-100 img-fluid rounded-top"
-            alt={recipe.title}
-          />
-        </div> */}
         <div className="col">
           <div className="card-body d-block">
             <div className="row">
@@ -116,6 +121,13 @@ const Recipe = ({
             )}
           </div>
         </div>
+        {/* <div className="col-2">
+          <img
+            src={recipe.img ? recipe.img : recipe.image}
+            className="w-auto h-100 img-fluid "
+            alt={recipe.title}showingResults
+          />
+        </div> */}
 
         {recipe.props && (
           <div className="card-footer">

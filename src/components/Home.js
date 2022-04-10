@@ -5,6 +5,7 @@ import { Button } from "react-bootstrap";
 import NoRecipes from "./NoRecipes";
 import Recipe from "./Recipe";
 import { useForm } from "../hooks/useForm";
+import Swal from "sweetalert2";
 
 const Home = () => {
   const [recipes, setRecipes] = useState([]);
@@ -25,52 +26,21 @@ const Home = () => {
 
   // Add recipe to the state
   const getRecipesByWord = () => {
-    // https://api.spoonacular.com/recipes/complexSearch?query=pasta&apiKey=ac51ac9699cf44628187112e6cb0f2de
     axios
       .get(
-        `https://api.spoonacular.com/recipes/complexSearch?query=${searchValue}&apiKey=${process.env.REACT_Home_API_KEY}`
+        `https://api.spoonacular.com/recipes/complexSearch?query=${searchValue}&apiKey=${process.env.REACT_APP_API_KEY}`
       )
       .then((res) => {
         setSearchResults([res.data["results"]][0]);
         setShowingResults(true);
-
-        // console.log(recipes);
-        // setRecipes([
-        //   {
-        //     id: recipe.id,
-        //     props: recipe.diets,
-        //     vegan: recipe.vegan,
-        //     summary: recipe.summary,
-        //     img: recipe.image,
-        //     title: recipe.title,
-        //     price: recipe.pricePerServing,
-        //     time: recipe.readyInMinutes,
-        //     healthScore: recipe.healthScore,
-        //   },
-        //   ...recipes,
-        // ]);
+      })
+      .catch((error) => {
+        Swal.fire(
+          "Hubo un problema",
+          "Por favor, vuelva a intentarlo más tarde.",
+          "warning"
+        );
       });
-    // axios
-    // .get(
-    //   `https://api.spoonacular.com/recipes/complexSearch?query=${searchValue}&apiKey=${process.env.REACT_Home_API_KEY}`
-    // )
-    // .then((res) => {
-    //   const recipe = res.data["recipes"][0];
-    //   setRecipes([
-    //     {
-    //       id: recipe.id,
-    //       props: recipe.diets,
-    //       vegan: recipe.vegan,
-    //       summary: recipe.summary,
-    //       img: recipe.image,
-    //       title: recipe.title,
-    //       price: recipe.pricePerServing,
-    //       time: recipe.readyInMinutes,
-    //       healthScore: recipe.healthScore,
-    //     },
-    //     ...recipes,
-    //   ]);
-    // });
   };
 
   //Delete recipe with provided id
@@ -102,21 +72,19 @@ const Home = () => {
 
     setMenuInformation({
       total: total,
-      avgPreparationTime: avgPreparationTime / recipes.length,
+      avgPreparationTime: avgPreparationTime,
       avgHS: parseFloat(avgHS) / recipes.length,
     });
   };
 
   useEffect(() => {
     updateMenuInfo();
-    // updateTotal();
-    // document.title = `$ ${updateTotal()} usd`;
   }, [recipes]);
 
   return (
     <div className="d-flex flex-column min-vh-100">
       <nav className="sticky-top d-flex justify-content-between navbar navbar-expand-lg navbar-light bg-light px-4 mb-4 shadow-sm">
-        <a className="navbar-brand mb-2" href="#">
+        <span className="navbar-brand mb-2" href="#">
           <svg
             width="50"
             height="36"
@@ -134,7 +102,7 @@ const Home = () => {
             />
           </svg>
           Menú Alkemy
-        </a>
+        </span>
         <form className="d-flex w-100" onSubmit={submit}>
           <input
             className="form-control mr-sm-2 w-80"
@@ -155,6 +123,7 @@ const Home = () => {
           </Button>
         </form>
       </nav>
+
       {showingResults && (
         <ul className="p-0 mx-4 mt-4">
           <h2 className="">Products with "{searchValue}"</h2>
@@ -172,7 +141,7 @@ const Home = () => {
           ))}
         </ul>
       )}
-      {recipes.length == 0 ? (
+      {recipes.length === 0 ? (
         <></>
       ) : (
         <div className="mx-4 pb-2 border-bottom d-flex justify-content-between">
@@ -199,7 +168,7 @@ const Home = () => {
         </div>
       )}
       <div className="x-4">
-        {recipes.length == 0 ? (
+        {recipes.length === 0 ? (
           <NoRecipes />
         ) : (
           <ul className="p-0 mx-4 mt-4">
